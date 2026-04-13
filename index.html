@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iNexus — AI-агент для осознанных отношений</title>
+  <meta name="description" content="iNexus анализирует реальные разговоры, выявляет паттерны и помогает говорить так, чтобы тебя слышали." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #0a0a0a; --dark: #111; --mid: #555; --muted: #888;
+      --border: #e8e8e8; --bg: #fff; --bg2: #fafafa;
+      --green: #16a34a; --green-bg: #dcfce7;
+      --wa: #25d366; --wa-bg: #e8fdf0;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--dark); -webkit-font-smoothing: antialiased; line-height: 1.6; }
+
+    /* NAV */
+    nav { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: rgba(255,255,255,0.94); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 48px; z-index: 100; }
+    .nav-brand { font-size: 18px; font-weight: 800; color: var(--black); letter-spacing: -0.04em; }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a { font-size: 14px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .nav-links a:hover { color: var(--dark); }
+    .nav-cta { background: var(--black); color: #fff; padding: 9px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: opacity 0.15s; }
+    .nav-cta:hover { opacity: 0.82; }
+
+    /* HERO */
+    .hero { padding: 148px 48px 80px; max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 7px; background: var(--green-bg); color: var(--green); font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 20px; margin-bottom: 24px; letter-spacing: 0.06em; text-transform: uppercase; }
+    .hero h1 { font-size: clamp(36px, 4.5vw, 60px); font-weight: 800; color: var(--black); line-height: 1.08; letter-spacing: -0.04em; margin-bottom: 20px; }
+    .hero h1 .muted { color: var(--muted); font-weight: 400; }
+    .hero-sub { font-size: 17px; color: var(--mid); line-height: 1.65; margin-bottom: 36px; max-width: 420px; }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-black { background: var(--black); color: #fff; padding: 14px 28px; border-radius: 10px; font-size: 15px; font-weight: 600; text-decoration: none; transition: opacity 0.15s, transform 0.1s; display: inline-block; }
+    .btn-black:hover { opacity: 0.83; transform: translateY(-1px); }
+    .btn-ghost { background: var(--bg2); color: var(--dark); border: 1px solid var(--border); padding: 14px 28px; border-radius: 10px; font-size: 15px; font-weight: 500; text-decoration: none; transition: background 0.15s; display: inline-block; }
+    .btn-ghost:hover { background: #efefef; }
+
+    /* CHAT MOCKUP */
+    .hero-mockup { background: #fff; border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.08); }
+    .mockup-bar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; align-items: center; gap: 6px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; } .dot-y { background: #febc2e; } .dot-g { background: #28c840; }
+    .mockup-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); background: #fff; }
+    .m-tab { padding: 10px 18px; font-size: 12px; font-weight: 600; color: var(--muted); border-bottom: 2px solid transparent; cursor: pointer; }
+    .m-tab.active { color: var(--black); border-bottom-color: var(--black); }
+    .mockup-msgs { padding: 20px 16px; display: flex; flex-direction: column; gap: 12px; min-height: 220px; background: #fff; }
+    .m-msg { padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; max-width: 82%; }
+    .m-msg.user { background: #f4f4f4; color: var(--dark); align-self: flex-start; }
+    .m-msg.ai { background: var(--black); color: #fff; align-self: flex-end; }
+    .m-label { font-size: 10px; color: var(--muted); margin-bottom: 3px; }
+    .m-label.right { text-align: right; }
+    .mockup-input { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; align-items: center; background: #fff; }
+    .mockup-input-field { flex: 1; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 12px; color: var(--muted); }
+    .mockup-send { background: var(--black); color: #fff; border: none; border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+    /* DIVIDER */
+    .divider { height: 1px; background: var(--border); max-width: 1100px; margin: 0 auto; }
+
+    /* SECTION */
+    .section { padding: 80px 48px; max-width: 1100px; margin: 0 auto; }
+    .s-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+    .s-title { font-size: clamp(28px, 3.5vw, 44px); font-weight: 800; color: var(--black); letter-spacing: -0.035em; line-height: 1.12; margin-bottom: 14px; }
+    .s-sub { font-size: 17px; color: var(--mid); max-width: 500px; line-height: 1.6; }
+
+    /* PROBLEM */
+    .problem-wrap { background: var(--bg2); border-radius: 24px; padding: 60px; max-width: 1100px; margin: 0 auto; }
+    .problem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 24px; margin-top: 44px; }
+    .p-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 26px; }
+    .p-icon { font-size: 26px; margin-bottom: 12px; }
+    .p-card h3 { font-size: 15px; font-weight: 700; color: var(--black); margin-bottom: 7px; }
+    .p-card p { font-size: 13px; color: var(--mid); line-height: 1.6; }
+
+    /* FEATURES */
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 20px; margin-top: 44px; }
+    .f-card { border: 1px solid var(--border); border-radius: 16px; padding: 28px; transition: border-color 0.15s, transform 0.15s; }
+    .f-card:hover { border-color: #bbb; transform: translateY(-2px); }
+    .f-icon { width: 42px; height: 42px; background: var(--bg2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 16px; }
+    .f-card h3 { font-size: 15px; font-weight: 700; color: var(--black); margin-bottom: 7px; }
+    .f-card p { font-size: 13px; color: var(--mid); line-height: 1.6; }
+    .f-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 5px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .f-badge-wa { background: var(--wa-bg); color: var(--wa); }
+    .f-badge-new { background: #eff6ff; color: #2563eb; }
+
+    /* QUOTE */
+    .quote-wrap { background: var(--black); border-radius: 24px; padding: 68px 60px; max-width: 1100px; margin: 0 auto; text-align: center; }
+    .quote-wrap blockquote { font-size: clamp(20px, 2.8vw, 34px); font-weight: 700; color: #fff; line-height: 1.3; letter-spacing: -0.02em; max-width: 700px; margin: 0 auto 20px; }
+    .quote-wrap cite { font-size: 13px; color: rgba(255,255,255,0.4); font-style: normal; }
+
+    /* STEPS */
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-top: 52px; }
+    .step-num { width: 34px; height: 34px; background: var(--black); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; margin-bottom: 16px; }
+    .step h3 { font-size: 15px; font-weight: 700; color: var(--black); margin-bottom: 7px; }
+    .step p { font-size: 13px; color: var(--mid); line-height: 1.6; }
+
+    /* AUDIENCE */
+    .audience-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 18px; margin-top: 44px; }
+    .a-card { border: 1px solid var(--border); border-radius: 16px; padding: 26px; }
+    .a-tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 9px; border-radius: 5px; margin-bottom: 12px; }
+    .tag-blue { background: #eff6ff; color: #2563eb; }
+    .tag-purple { background: #fdf4ff; color: #9333ea; }
+    .tag-orange { background: #fff7ed; color: #ea580c; }
+    .a-card h3 { font-size: 15px; font-weight: 700; color: var(--black); margin-bottom: 7px; }
+    .a-card p { font-size: 13px; color: var(--mid); line-height: 1.6; }
+
+    /* CTA */
+    .cta-wrap { text-align: center; padding: 100px 48px; max-width: 680px; margin: 0 auto; }
+    .cta-wrap h2 { font-size: clamp(28px, 4vw, 48px); font-weight: 800; color: var(--black); letter-spacing: -0.035em; margin-bottom: 18px; }
+    .cta-wrap p { font-size: 17px; color: var(--mid); margin-bottom: 36px; }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 28px 48px; display: flex; align-items: center; justify-content: space-between; max-width: 1100px; margin: 0 auto; }
+    footer .brand { font-size: 15px; font-weight: 800; color: var(--black); letter-spacing: -0.03em; }
+    footer p { font-size: 13px; color: var(--muted); }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding: 110px 24px 60px; gap: 40px; }
+      nav { padding: 0 24px; }
+      .nav-links { display: none; }
+      .section { padding: 60px 24px; }
+      .problem-wrap { padding: 36px 24px; border-radius: 16px; }
+      .quote-wrap { padding: 44px 28px; border-radius: 16px; }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">iNexus</span>
+  <ul class="nav-links">
+    <li><a href="#features">Функции</a></li>
+    <li><a href="#how">Как работает</a></li>
+    <li><a href="#audience">Для кого</a></li>
+  </ul>
+  <a href="https://calm-talk-agent-production.up.railway.app" class="nav-cta">Попробовать →</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <div class="hero-badge">✦ AI для отношений</div>
+    <h1>Понимай что<br>происходит<br><span class="muted">в твоих отношениях</span></h1>
+    <p class="hero-sub">iNexus анализирует реальные разговоры, выявляет паттерны и помогает говорить так, чтобы тебя слышали.</p>
+    <div class="hero-actions">
+      <a href="https://calm-talk-agent-production.up.railway.app" class="btn-black">Начать бесплатно →</a>
+      <a href="#features" class="btn-ghost">Узнать больше</a>
+    </div>
+  </div>
+  <div class="hero-mockup">
+    <div class="mockup-bar">
+      <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+    </div>
+    <div class="mockup-tabs">
+      <div class="m-tab active">Chat</div>
+      <div class="m-tab">Insights</div>
+      <div class="m-tab">Patterns</div>
+    </div>
+    <div class="mockup-msgs">
+      <div>
+        <div class="m-label">Я</div>
+        <div class="m-msg user">Она опять обиделась. Я не написал вовремя и теперь молчание на весь вечер.</div>
+      </div>
+      <div>
+        <div class="m-label right">iNexus</div>
+        <div class="m-msg ai">Это третий раз за месяц. Для неё "не написал" = "не думаешь обо мне". Попробуй: "Я понимаю что тебе важно знать что я помню о тебе."</div>
+      </div>
+      <div>
+        <div class="m-label">Я</div>
+        <div class="m-msg user">Откуда ты знаешь что третий раз?</div>
+      </div>
+      <div>
+        <div class="m-label right">iNexus</div>
+        <div class="m-msg ai">Я анализирую всю историю — голосовые, переписку. Этот паттерн повторяется каждые 10–14 дней.</div>
+      </div>
+    </div>
+    <div class="mockup-input">
+      <div class="mockup-input-field">Расскажи что произошло…</div>
+      <button class="mockup-send">→</button>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PROBLEM -->
+<div style="padding: 80px 48px; max-width: 1100px; margin: 0 auto;">
+  <div class="problem-wrap">
+    <div class="s-label">Проблема</div>
+    <div class="s-title">Мы не помним<br>что реально говорилось</div>
+    <div class="problem-grid">
+      <div class="p-card">
+        <div class="p-icon">🌀</div>
+        <h3>Одни и те же конфликты</h3>
+        <p>Ссоры повторяются по одному сценарию. Ты это чувствуешь, но не видишь паттерн целиком.</p>
+      </div>
+      <div class="p-card">
+        <div class="p-icon">🧠</div>
+        <h3>Память избирательна</h3>
+        <p>Ты помнишь своё ощущение, а не слова. Другой человек помнит иначе. Истина где-то посередине.</p>
+      </div>
+      <div class="p-card">
+        <div class="p-icon">💬</div>
+        <h3>Не знаешь как сказать</h3>
+        <p>Ты чувствуешь что-то важное, но в нужный момент слова не находятся или выходят не так.</p>
+      </div>
+      <div class="p-card">
+        <div class="p-icon">⏳</div>
+        <h3>Терапия раз в неделю</h3>
+        <p>Между сессиями жизнь продолжается. Нужен инструмент который работает каждый день.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="section" id="features">
+  <div class="s-label">Функции</div>
+  <div class="s-title">Всё что нужно<br>для понимания отношений</div>
+  <div class="features-grid">
+    <div class="f-card">
+      <div class="f-icon">🤖</div>
+      <h3>AI-чат с памятью</h3>
+      <p>Персональный агент который знает всю историю твоих отношений. Не нужно каждый раз объяснять контекст.</p>
+    </div>
+    <div class="f-card">
+      <div class="f-icon">📲</div>
+      <span class="f-badge f-badge-wa">WhatsApp</span>
+      <h3>Импорт голосовых</h3>
+      <p>Загружай голосовые из WhatsApp (.opus). AI автоматически транскрибирует и разбивает по спикерам.</p>
+    </div>
+    <div class="f-card">
+      <div class="f-icon">🔍</div>
+      <span class="f-badge f-badge-new">Insights</span>
+      <h3>Паттерны и динамика</h3>
+      <p>AI выявляет повторяющиеся сценарии и триггеры. Видишь картину целиком, а не отдельные эпизоды.</p>
+    </div>
+    <div class="f-card">
+      <div class="f-icon">🚫</div>
+      <h3>Red Lines</h3>
+      <p>Фиксируй личные границы. Отслеживай нарушения. Видь системные паттерны нарушения твоих границ.</p>
+    </div>
+    <div class="f-card">
+      <div class="f-icon">💬</div>
+      <h3>Библиотека фраз</h3>
+      <p>Готовые формулировки для сложных разговоров. Как сказать важное — без обвинений и защитной реакции.</p>
+    </div>
+    <div class="f-card">
+      <div class="f-icon">👥</div>
+      <h3>Несколько контактов</h3>
+      <p>Отдельный профиль для каждого человека: партнёр, родитель, коллега. Всё структурировано.</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- QUOTE -->
+<div style="padding: 80px 48px; max-width: 1100px; margin: 0 auto;">
+  <div class="quote-wrap">
+    <blockquote>"iNexus слышит твои разговоры, видит паттерны и помогает говорить так, чтобы тебя слышали."</blockquote>
+    <cite>Принцип продукта</cite>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="section" id="how">
+  <div class="s-label">Как работает</div>
+  <div class="s-title">Четыре шага<br>к ясности</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Загрузи разговоры</h3>
+      <p>Голосовые из WhatsApp, экспорт чатов или просто расскажи что произошло. AI запомнит всё.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Получи анализ</h3>
+      <p>AI выявляет паттерны, триггеры и динамику. Видишь картину целиком, а не отдельные эпизоды.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Действуй иначе</h3>
+      <p>Получи конкретные формулировки для следующего разговора. Подготовься, а не реагируй.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <h3>Отслеживай изменения</h3>
+      <p>Видь как меняется динамика со временем. Что улучшилось, что остаётся проблемой.</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- AUDIENCE -->
+<div class="section" id="audience">
+  <div class="s-label">Для кого</div>
+  <div class="s-title">Для тех кто хочет<br>расти в отношениях</div>
+  <p class="s-sub">iNexus не для пар. Это инструмент для одного человека — твоя точка зрения, твоя работа над собой.</p>
+  <div class="audience-grid">
+    <div class="a-card">
+      <span class="a-tag tag-blue">Партнёрские отношения</span>
+      <h3>Длительные отношения</h3>
+      <p>Накопились паттерны, конфликты повторяются. Хочешь понять динамику и изменить её — не уходя из отношений.</p>
+    </div>
+    <div class="a-card">
+      <span class="a-tag tag-purple">Личная работа</span>
+      <h3>Параллельно с терапией</h3>
+      <p>iNexus как "домашнее задание" между сессиями. Фиксируй, анализируй, приходи к терапевту с конкретикой.</p>
+    </div>
+    <div class="a-card">
+      <span class="a-tag tag-orange">Сложные динамики</span>
+      <h3>Семья и работа</h3>
+      <p>Токсичный руководитель, сложный родитель, конфликтный коллега. Понимай паттерны и защищай свои границы.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-wrap">
+  <h2>Начни понимать<br>что происходит</h2>
+  <p>Бесплатно. Без регистрации. Просто открой и начни.</p>
+  <a href="https://calm-talk-agent-production.up.railway.app" class="btn-black" style="font-size:16px; padding:16px 36px;">
+    Открыть iNexus →
+  </a>
+</div>
+
+<div class="divider"></div>
+<footer>
+  <span class="brand">iNexus</span>
+  <p>AI-агент для осознанных отношений</p>
+  <p>© 2026</p>
+</footer>
+
+</body>
+</html>
